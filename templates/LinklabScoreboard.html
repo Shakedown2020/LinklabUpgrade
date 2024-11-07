@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Lab Scoreboard</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+    <script>
+        const UPDATE_INTERVAL = 30000; // 定义常量
+
+        function fetchScores() {
+            $.ajax({
+                url: '/scores',
+                type: 'GET',
+                success: function(scores) {
+                    var scoresTable = $('#scoresTable');
+                    scoresTable.empty(); // 清空表格
+                    var allGrades = []; // 存储所有grade的数组，用于计算排名
+
+                    for (var work_id in scores) {
+                        var lenGrade = scores[work_id].grade.length;
+                        var grade = scores[work_id].grade.join(', ');
+                        allGrades.push({id: work_id, grade: lenGrade}); // 将学生ID和grade长度添加到数组中
+                    }
+
+                    // 根据grade长度对所有grade进行排序
+                    allGrades.sort(function(a, b) {
+                        return b.grade - a.grade; // 降序排序
+                    });
+
+                    // 为每个grade分配排名
+                    for (var i = 0; i < allGrades.length; i++) {
+                        allGrades[i].rank = i + 1; // 排名从1开始
+                    }
+
+                    // 再次遍历scores，添加排名信息到表格中
+                    for (var work_id in scores) {
+                        var lenGrade = scores[work_id].grade.length;
+                        var grade = scores[work_id].grade.join(', ');
+                        var rank = allGrades.find(x => x.id === work_id).rank; // 找到对应的排名
+                        var row = $('<tr></tr>');
+                        row.append($('<td></td>').text(work_id));
+                        row.append($('<td></td>').text(lenGrade));
+                        row.append($('<td></td>').text(grade));
+                        row.append($('<td></td>').text(rank)); // 添加排名列
+                        scoresTable.append(row);
+                    }
+                }
+            });
+            updateTime();
+        }
+
+        function updateTime(){
+            var now = new Date();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;//时间格式化为两位数
+            var timeStr = hours + ':' + minutes + ':' + seconds;//拼接成字符串
+            document.getElementById("time").textContent = 'Last updated: ' + timeStr + ' (update every ' + UPDATE_INTERVAL / 1000 + ' secs)';
+            setInterval(updateTime, UPDATE_INTERVAL);
+        }
+
+        $(document).ready(function() {
+            fetchScores(); // 初始加载
+            setInterval(fetchScores, UPDATE_INTERVAL); 
+            // 每UPDATE_INTERVAL毫秒更新一次
+        });
+    </script>
+</head>
+<body style="background-color: #ffffff;">
+    <h2>Link Lab Scoreboard</h2>
+    <p>
+    <table width="500"><tbody><tr><td>
+    This page contains the latest information
+    that we have received from your bomb. If your solution is marked 
+    <font color="ff0000"><b>invalid</b></font>, 
+    this means your bomb reported a solution that didn't actually defuse your bomb.
+    </td></tr></tbody></table>
+    </p><p id="time">Last updated: -- (update every 30 secs)<br>
+    
+    </p><p>
+    <table border="0" cellspacing="1" cellpadding="1" id="scoresTable">
+    <tbody><tr bgcolor="#b8d8ff" align="center">
+    <th align="center" width="90">Bomb number</th>
+    <th align="center" width="80">Phases defused</th>
+    <th align="center" width="80">Score</th>
+    <th>Status</th>
+    </tr>
+    </tbody></table>
+    <font size="-1">Summary [phase:cnt]  </font>
+    <font size="-1"> [1:0]  </font><font size="-1"> [2:0]  </font><font size="-1"> [3:0]  </font><font size="-1"> [4:0]  </font><font size="-1"> [5:0]  </font><font size="-1"> [6:0]  </font><font size="-1"> total defused = 0/0<br>
+     </font></p><p>
+    </p>
+</body>
+</html>
