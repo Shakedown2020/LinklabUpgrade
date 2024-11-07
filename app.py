@@ -2,7 +2,8 @@ from flask import Flask, request, send_file, render_template,jsonify
 import os
 import json
 import subprocess  # 用于运行系统命令
-
+import io
+import csv
 app = Flask(__name__)
 
 SRC_DIR = 'src'
@@ -81,6 +82,10 @@ def get_scores():
 @app.route('/scoreboard')
 def scoreboard():
     return render_template('LinklabScoreboard.html')
+
+@app.route('/teacher')
+def teacher_dashboard():
+    return render_template('teacher_dashboard.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

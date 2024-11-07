@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Link Lab Challenge</title>
+    <title>Link Lab Challenge - Teacher</title>
 
     <!-- 外部CSS -->
     <link
@@ -241,88 +241,17 @@
     <div class="progress-bar" id="progressBar"></div>
 
     <div id="fullpage">
-      <div class="section welcome-section">
-        <div class="flex flex-col items-center justify-center min-h-screen">
-          <div class="welcome-text typewriter typewriter-1">
-            <h1 class="welcome-title">Hello 👋</h1>
-          </div>
-          <div class="welcome-text typewriter typewriter-2">
-            <h2 class="welcome-subtitle">Welcome to LinkLab!</h2>
-          </div>
-          <div class="welcome-text typewriter typewriter-3">
-            <h2 class="welcome-subtitle">Have a nice trip ✨</h2>
-          </div>
-          <div class="start-button">↓</div>
-        </div>
-      </div>
-      <!-- 第2页：下载Bomb文件 -->
-      <div class="section">
+      <!-- 第1页：教师界面（查看记分榜和下载CSV） -->
+      <div class="section" id="teacher">
         <div class="level-title">
-          <span class="level-step">Step One</span>
+          <span class="level-step">Step Four: Teacher</span>
         </div>
         <div class="flex items-center justify-center min-h-screen">
           <div class="game-card animate__animated animate__fadeIn ml-[20%]">
-            <h2 class="text-4xl font-bold mb-8 text-center">获取你的挑战</h2>
-            <form method="post" action="/generate" class="space-y-6">
-              <div class="relative">
-                <input
-                  type="text"
-                  name="student_id"
-                  class="w-full bg-transparent border-2 border-white/30 rounded-lg p-4 text-white"
-                  placeholder="输入你的学号"
-                  required
-                />
-              </div>
-              <button type="submit" class="game-button w-full">生成并下载挑战包</button>
-            </form>
-          </div>
-        </div>
-        <div class="scroll-arrow">↓</div>
-      </div>
-
-      <!-- 第二页：上传评分文件 -->
-      <div class="section">
-        <div class="level-title">
-          <span class="level-step">Step Two</span>
-        </div>
-        <div class="flex items-center justify-center min-h-screen">
-          <div class="game-card animate__animated animate__fadeIn ml-[20%]">
-            <h2 class="text-4xl font-bold mb-8 text-center">提交你的答案</h2>
-            <form
-              id="uploadForm"
-              action="/upload"
-              method="post"
-              enctype="multipart/form-data"
-              class="space-y-6"
-              onsubmit="handleUpload(event)"
-            >
-              <div class="relative">
-                <input
-                  type="file"
-                  name="file"
-                  accept=".tar"
-                  class="w-full bg-transparent border-2 border-white/30 rounded-lg p-4 text-white"
-                  required
-                />
-              </div>
-              <button type="submit" class="game-button w-full">上传评分文件</button>
-            </form>
-          </div>
-        </div>
-        <div class="scroll-arrow">↓</div>
-      </div>
-
-      <!-- 第三页：查看评分板 -->
-      <div class="section">
-        <div class="level-title">
-          <span class="level-step">Step Three</span>
-        </div>
-        <div class="flex items-center justify-center min-h-screen">
-          <div class="game-card animate__animated animate__fadeIn ml-[20%]">
-            <h2 class="text-4xl font-bold mb-8 text-center">查看排行榜</h2>
-            <p id="time" class="text-center mb-4">Last updated: -- (update every 30 secs)</p>
+            <h2 class="text-4xl font-bold mb-8 text-center">教师 - 评分榜</h2>
+            <p id="teacherTime" class="text-center mb-4">Last updated: -- (update every 30 secs)</p>
             <div class="score-container">
-              <table class="w-full" id="scoresTable">
+              <table class="w-full" id="teacherScoresTable">
                 <thead>
                   <tr class="border-b border-white/20">
                     <th class="p-4">Student ID</th>
@@ -335,6 +264,7 @@
                 <tbody></tbody>
               </table>
             </div>
+            <button id="downloadCSV" class="game-button w-full mt-4">下载评分榜 CSV</button>
           </div>
         </div>
       </div>
@@ -343,25 +273,9 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/4.0.20/fullpage.min.js"></script>
     <script>
-      new fullpage("#fullpage", {
-        autoScrolling: true,
-        scrollHorizontally: true,
-        navigation: true,
-        navigationPosition: "right",
-        onLeave: function (origin, destination, direction) {
-          document.getElementById("progressBar").style.width = destination.index * 33.33 + "%";
-
-          const cards = document.querySelectorAll(".game-card");
-          if (cards[destination.index - 1]) {
-            cards[destination.index - 1].classList.add("animate__fadeIn");
-          }
-        },
-        afterLoad: function (origin, destination, direction) {
-          fullpage_api.setAllowScrolling(true);
-        },
-      });
-
       const UPDATE_INTERVAL = 30000; // 30 seconds
+
+      let scoresData = [];
 
       async function fetchScores() {
         try {
@@ -391,7 +305,8 @@
             item.rank = item.grade > 0 ? rank++ : "N/A";
           });
 
-          updateScoreTable(scores, allGrades);
+          scoresData = scores; // 保存评分数据
+          updateTeacherScoreTable(scores, allGrades);
           updateTime();
         } catch (error) {
           console.error("Error fetching scores:", error);
@@ -399,8 +314,8 @@
         }
       }
 
-      function updateScoreTable(scores, allGrades) {
-        const tbody = document.getElementById("scoresTable").getElementsByTagName("tbody")[0];
+      function updateTeacherScoreTable(scores, allGrades) {
+        const tbody = document.getElementById("teacherScoresTable").getElementsByTagName("tbody")[0];
         tbody.innerHTML = "";
 
         allGrades.forEach(({ id, rank }) => {
@@ -418,9 +333,36 @@
 
       function updateTime() {
         const now = new Date();
-        document.getElementById(
-          "time"
-        ).textContent = `Last updated: ${now.toLocaleTimeString()} (update every 30 secs)`;
+        document.getElementById("teacherTime").textContent = `Last updated: ${now.toLocaleTimeString()} (update every 30 secs)`;
+      }
+
+      // 导出评分数据为CSV文件
+      document.getElementById("downloadCSV").addEventListener("click", function () {
+        const csvContent = convertToCSV(scoresData);
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "scores.csv");
+        link.click();
+      });
+
+      function convertToCSV(data) {
+        const headers = ["Student ID", "Upload Time", "Phases", "Score", "Status"];
+        let csv = headers.join(",") + "\n";
+
+        for (const [id, score] of Object.entries(data)) {
+          const row = [
+            id,
+            score.upload_time || "-",
+            score.grade,
+            score.grade.length * 10,
+            score.rank || "-",
+          ];
+          csv += row.join(",") + "\n";
+        }
+
+        return csv;
       }
 
       document.addEventListener("DOMContentLoaded", () => {
@@ -428,61 +370,6 @@
         fetchScores();
         setInterval(fetchScores, UPDATE_INTERVAL);
       });
-
-      document.querySelector(".start-button").addEventListener("click", function () {
-        fullpage_api.moveSectionDown();
-      });
-
-      document.querySelectorAll(".scroll-arrow").forEach((arrow) => {
-        arrow.addEventListener("click", function () {
-          fullpage_api.moveSectionDown();
-        });
-      });
-
-      async function handleUpload(event) {
-        event.preventDefault();
-
-        const form = event.target;
-        const formData = new FormData(form);
-
-        try {
-          const response = await fetch("/upload", {
-            method: "POST",
-            body: formData,
-          });
-
-          if (response.ok) {
-            const text = await response.text();
-            // 解析返回的文本
-            const match = text.match(/评分结果：<br>(.*?):\s*(\d+)\s*@\s*\[(.*?)\]/);
-
-            if (match) {
-              const [_, id, score, stages] = match;
-              // 创建一个评分对象
-              const scoreData = {
-                [id]: {
-                  grade: stages ? stages.split(",").map((s) => s.trim()) : [],
-                  score: parseInt(score),
-                  rank: "-", // 暂时不处理排名
-                },
-              };
-
-              // 更新表格
-              updateScoreTable(scoreData);
-            }
-
-            // 自动滚动到评分板页面
-            fullpage_api.moveTo(4);
-
-            // 清空表单
-            form.reset();
-          } else {
-            console.error("Upload failed");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      }
     </script>
   </body>
 </html>
