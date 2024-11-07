@@ -22,6 +22,11 @@
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
 
     <style>
       .section {
@@ -235,6 +240,43 @@
           transform: translateY(-10px) translateX(-50%);
         }
       }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+      }
+
+      th, td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      th {
+        background-color: rgba(0, 191, 255, 0.1);
+        font-weight: bold;
+        color: #00bfff;
+      }
+
+      tr:nth-child(even) {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      tr:hover {
+        background-color: rgba(0, 191, 255, 0.1);
+      }
+
+      td {
+        color: #fff;
+      }
+
+      thead {
+        position: sticky;
+        top: 0;
+        background-color: #1a1a1a;
+        z-index: 1;
+      }
     </style>
   </head>
   <body>
@@ -247,7 +289,7 @@
             <h1 class="welcome-title">Hello 👋</h1>
           </div>
           <div class="welcome-text typewriter typewriter-2">
-            <h2 class="welcome-subtitle">Welcome to LinkLab!</h2>
+            <h2 class="welcome-subtitle">Welcome to LinkLab !</h2>
           </div>
           <div class="welcome-text typewriter typewriter-3">
             <h2 class="welcome-subtitle">Have a nice trip ✨</h2>
@@ -262,18 +304,18 @@
         </div>
         <div class="flex items-center justify-center min-h-screen">
           <div class="game-card animate__animated animate__fadeIn ml-[20%]">
-            <h2 class="text-4xl font-bold mb-8 text-center">获取你的挑战</h2>
+            <h2 class="text-4xl font-bold mb-8 text-center">Get your challenge</h2>
             <form method="post" action="/generate" class="space-y-6">
               <div class="relative">
                 <input
                   type="text"
                   name="student_id"
                   class="w-full bg-transparent border-2 border-white/30 rounded-lg p-4 text-white"
-                  placeholder="输入你的学号"
+                  placeholder="Input your student ID"
                   required
                 />
               </div>
-              <button type="submit" class="game-button w-full">生成并下载挑战包</button>
+              <button type="submit" class="game-button w-full">Generate and download</button>
             </form>
           </div>
         </div>
@@ -287,7 +329,7 @@
         </div>
         <div class="flex items-center justify-center min-h-screen">
           <div class="game-card animate__animated animate__fadeIn ml-[20%]">
-            <h2 class="text-4xl font-bold mb-8 text-center">提交你的答案</h2>
+            <h2 class="text-4xl font-bold mb-8 text-center">Submit your answer</h2>
             <form
               id="uploadForm"
               action="/upload"
@@ -305,7 +347,7 @@
                   required
                 />
               </div>
-              <button type="submit" class="game-button w-full">上传评分文件</button>
+              <button type="submit" class="game-button w-full">Submit your answer</button>
             </form>
           </div>
         </div>
@@ -318,8 +360,8 @@
           <span class="level-step">Step Three</span>
         </div>
         <div class="flex items-center justify-center min-h-screen">
-          <div class="game-card animate__animated animate__fadeIn ml-[20%]">
-            <h2 class="text-4xl font-bold mb-8 text-center">查看排行榜</h2>
+          <div class="game-card animate__animated animate__fadeIn ml-[20%]" style="width: 600px">
+            <h2 class="text-4xl font-bold mb-8 text-center">Check the leaderboard</h2>
             <p id="time" class="text-center mb-4">Last updated: -- (update every 30 secs)</p>
             <div class="score-container">
               <table class="w-full" id="scoresTable">
@@ -342,23 +384,49 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/4.0.20/fullpage.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-      new fullpage("#fullpage", {
-        autoScrolling: true,
-        scrollHorizontally: true,
-        navigation: true,
-        navigationPosition: "right",
-        onLeave: function (origin, destination, direction) {
-          document.getElementById("progressBar").style.width = destination.index * 33.33 + "%";
+      document.addEventListener("DOMContentLoaded", () => {
+        // Check the URL hash and set the initial section
+        const hash = window.location.hash;
+        let initialSection = 1; // Default to the first section
 
-          const cards = document.querySelectorAll(".game-card");
-          if (cards[destination.index - 1]) {
-            cards[destination.index - 1].classList.add("animate__fadeIn");
+        if (hash) {
+          const sectionIndex = parseInt(hash.replace("#section-", ""), 10);
+          if (!isNaN(sectionIndex)) {
+            initialSection = sectionIndex + 1; // fullPage.js sections are 1-indexed
           }
-        },
-        afterLoad: function (origin, destination, direction) {
-          fullpage_api.setAllowScrolling(true);
-        },
+        }
+
+        new fullpage("#fullpage", {
+          autoScrolling: true,
+          scrollHorizontally: true,
+          navigation: true,
+          navigationPosition: "right",
+          anchors: ["section-0", "section-1", "section-2", "section-3"], // Add anchors for each section
+          sectionSelector: ".section",
+          afterRender: function () {
+            fullpage_api.moveTo(initialSection);
+          },
+          onLeave: function (origin, destination, direction) {
+            document.getElementById("progressBar").style.width = destination.index * 33.33 + "%";
+
+            const cards = document.querySelectorAll(".game-card");
+            if (cards[destination.index - 1]) {
+              cards[destination.index - 1].classList.add("animate__fadeIn");
+            }
+
+            // Store the current section index in the URL hash
+            window.location.hash = `section-${destination.index}`;
+          },
+          afterLoad: function (origin, destination, direction) {
+            fullpage_api.setAllowScrolling(true);
+          },
+        });
+
+        updateTime();
+        fetchScores();
+        setInterval(fetchScores, UPDATE_INTERVAL);
       });
 
       const UPDATE_INTERVAL = 30000; // 30 seconds
@@ -423,12 +491,6 @@
         ).textContent = `Last updated: ${now.toLocaleTimeString()} (update every 30 secs)`;
       }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        updateTime();
-        fetchScores();
-        setInterval(fetchScores, UPDATE_INTERVAL);
-      });
-
       document.querySelector(".start-button").addEventListener("click", function () {
         fullpage_api.moveSectionDown();
       });
@@ -453,28 +515,24 @@
 
           if (response.ok) {
             const text = await response.text();
-            // 解析返回的文本
+            // Parse the returned text
             const match = text.match(/评分结果：<br>(.*?):\s*(\d+)\s*@\s*\[(.*?)\]/);
 
             if (match) {
               const [_, id, score, stages] = match;
-              // 创建一个评分对象
-              const scoreData = {
-                [id]: {
-                  grade: stages ? stages.split(",").map((s) => s.trim()) : [],
-                  score: parseInt(score),
-                  rank: "-", // 暂时不处理排名
-                },
-              };
 
-              // 更新表格
-              updateScoreTable(scoreData);
+              // Show a toast with detailed score information
+              Toastify({
+                text: `Student ID: ${id}\nScore: ${score}\nStages: ${stages}`,
+                duration: 5000, // Duration in milliseconds
+                close: true,
+                gravity: "top", // Position: top or bottom
+                position: "center", // Position: left, center or right
+                backgroundColor: "linear-gradient(to right, #00bfff, #0080ff)",
+              }).showToast();
             }
 
-            // 自动滚动到评分板页面
-            fullpage_api.moveTo(4);
-
-            // 清空表单
+            // Reset the form
             form.reset();
           } else {
             console.error("Upload failed");

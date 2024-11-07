@@ -219,6 +219,43 @@
         font-size: 2rem;
         z-index: 10;
       }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+      }
+
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      th {
+        background-color: rgba(0, 191, 255, 0.1);
+        font-weight: bold;
+        color: #00bfff;
+      }
+
+      tr:nth-child(even) {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      tr:hover {
+        background-color: rgba(0, 191, 255, 0.1);
+      }
+
+      td {
+        color: #fff;
+      }
+
+      thead {
+        position: sticky;
+        top: 0;
+        background-color: #1a1a1a;
+        z-index: 1;
+      }
 
       @keyframes bounce {
         0%,
@@ -247,7 +284,7 @@
           <span class="level-step">Step Four: Teacher</span>
         </div>
         <div class="flex items-center justify-center min-h-screen">
-          <div class="game-card animate__animated animate__fadeIn ml-[20%]">
+          <div class="game-card animate__animated animate__fadeIn ml-[20%]" style="width: 600px">
             <h2 class="text-4xl font-bold mb-8 text-center">教师 - 评分榜</h2>
             <p id="teacherTime" class="text-center mb-4">Last updated: -- (update every 30 secs)</p>
             <div class="score-container">
@@ -315,7 +352,9 @@
       }
 
       function updateTeacherScoreTable(scores, allGrades) {
-        const tbody = document.getElementById("teacherScoresTable").getElementsByTagName("tbody")[0];
+        const tbody = document
+          .getElementById("teacherScoresTable")
+          .getElementsByTagName("tbody")[0];
         tbody.innerHTML = "";
 
         allGrades.forEach(({ id, rank }) => {
@@ -333,7 +372,9 @@
 
       function updateTime() {
         const now = new Date();
-        document.getElementById("teacherTime").textContent = `Last updated: ${now.toLocaleTimeString()} (update every 30 secs)`;
+        document.getElementById(
+          "teacherTime"
+        ).textContent = `Last updated: ${now.toLocaleTimeString()} (update every 30 secs)`;
       }
 
       // 导出评分数据为CSV文件
@@ -348,16 +389,17 @@
       });
 
       function convertToCSV(data) {
-        const headers = ["Student ID", "Upload Time", "Phases", "Score", "Status"];
+        const headers = ["Student ID", "Upload Time", "Phase1", "Phase2", "Phase3", "Score"];
         let csv = headers.join(",") + "\n";
 
         for (const [id, score] of Object.entries(data)) {
           const row = [
             id,
             score.upload_time || "-",
-            score.grade,
+            score.grade.includes(1) ? "10" : "-",
+            score.grade.includes(2) ? "10" : "-",
+            score.grade.includes(3) ? "10" : "-",
             score.grade.length * 10,
-            score.rank || "-",
           ];
           csv += row.join(",") + "\n";
         }
