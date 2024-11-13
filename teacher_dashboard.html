@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Link Lab Challenge - Teacher</title>
+
+    <!-- 外部CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/4.0.20/fullpage.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      .section {
+        background: #1a1a1a;
+        color: white;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .section::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent 45%,
+          rgba(0, 191, 255, 0.1) 50%,
+          transparent 55%
+        );
+        transform: rotate(45deg);
+        animation: shine 10s linear infinite;
+      }
+
+      .level-title {
+        position: absolute;
+        left: -20px;
+        top: 40px;
+        padding: 1rem 6rem 1rem 3rem;
+        background: #00bfff;
+        color: #fff;
+        font-family: "Orbitron", sans-serif;
+        clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+        transform: skew(-15deg);
+        z-index: 2;
+      }
+
+      .level-step {
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3rem;
+        font-weight: 700;
+        display: block;
+        transform: skew(15deg);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .game-button {
+        background: linear-gradient(45deg, #00bfff, #0080ff);
+        padding: 15px 30px;
+        border-radius: 25px;
+        color: white;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3);
+      }
+
+      .game-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 191, 255, 0.4);
+      }
+
+      .game-card {
+        width: 480px;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 1px solid rgba(0, 191, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 191, 255, 0.1);
+        position: relative;
+        z-index: 1;
+      }
+
+      @keyframes shine {
+        0% {
+          transform: translateX(-50%) rotate(45deg);
+        }
+        100% {
+          transform: translateX(50%) rotate(45deg);
+        }
+      }
+
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        background: #00bfff;
+        z-index: 1000;
+        transition: width 0.5s ease;
+      }
+
+      .welcome-section {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .welcome-text {
+        font-family: "Orbitron", sans-serif;
+        color: #fff;
+        text-align: center;
+        opacity: 1;
+      }
+
+      .welcome-title {
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .welcome-subtitle {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .start-button {
+        display: inline-block;
+        font-size: 3rem;
+        color: rgba(0, 191, 255, 0.8);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0;
+        animation: fadeIn 1s forwards, bounce 2s infinite;
+        animation-delay: 3s;
+        margin-top: 2rem;
+      }
+
+      .start-button:hover {
+        color: rgba(0, 191, 255, 1);
+        text-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .typewriter {
+        overflow: hidden;
+        white-space: nowrap;
+        margin: 0 auto;
+        opacity: 0;
+      }
+
+      .typewriter-1 {
+        animation: typing 4s steps(40, end) forwards;
+        animation-delay: 0s;
+      }
+
+      .typewriter-2 {
+        animation: typing 4s steps(40, end) forwards;
+        animation-delay: 1s;
+      }
+
+      .typewriter-3 {
+        animation: typing 4s steps(40, end) forwards;
+        animation-delay: 2s;
+      }
+
+      @keyframes typing {
+        0% {
+          width: 0;
+          opacity: 1;
+        }
+        100% {
+          width: 100%;
+          opacity: 1;
+        }
+      }
+
+      .score-container {
+        max-height: 60vh;
+        overflow-y: auto;
+        margin: 1rem 0;
+      }
+
+      .scroll-arrow {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        cursor: pointer;
+        animation: bounce 2s infinite;
+        color: rgba(0, 191, 255, 0.6);
+        font-size: 2rem;
+        z-index: 10;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+      }
+
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      th {
+        background-color: rgba(0, 191, 255, 0.1);
+        font-weight: bold;
+        color: #00bfff;
+      }
+
+      tr:nth-child(even) {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      tr:hover {
+        background-color: rgba(0, 191, 255, 0.1);
+      }
+
+      td {
+        color: #fff;
+      }
+
+      thead {
+        position: sticky;
+        top: 0;
+        background-color: #1a1a1a;
+        z-index: 1;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0) translateX(-50%);
+        }
+        40% {
+          transform: translateY(-20px) translateX(-50%);
+        }
+        60% {
+          transform: translateY(-10px) translateX(-50%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div id="fullpage">
+      <!-- 第1页：教师界面（查看记分榜和下载CSV） -->
+      <div class="section" id="teacher">
+  <div class="level-title">
+    <span class="level-step">Step Four: Teacher</span>
+  </div>
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="game-card animate__animated animate__fadeIn ml-[20%]" style="width: 600px">
+      <h2 class="text-4xl font-bold mb-8 text-center">教师 - 评分榜</h2>
+      <p id="teacherTime" class="text-center mb-4">Last updated: -- (update every 30 secs)</p>
+      <div class="score-container">
+        <table class="w-full" id="teacherScoresTable">
+          <thead>
+            <tr class="border-b border-white/20">
+              <th class="p-4">Student ID</th>
+              <th class="p-4">Upload Time</th>
+              <th class="p-4">Phase1</th>
+              <th class="p-4">Phase2</th>
+              <th class="p-4">Phase3</th>
+              <th class="p-4">Score</th>
+              <th class="p-4">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 学生分数数据将通过JavaScript动态插入 -->
+          </tbody>
+        </table>
+      </div>
+      <button id="downloadCSV" class="game-button w-full mt-4">下载评分榜 CSV</button>
+    </div>
+  </div>
+</div>
+
+    
+    <!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/4.0.20/fullpage.min.js"></script>
+<script>
+  const UPDATE_INTERVAL = 30000; // 30 seconds
+
+  let scoresData = {};
+  let studentList = [];
+
+  async function fetchStudentList() {
+  try {
+    const response = await fetch("/stulist");
+    if (!response.ok) throw new Error('Failed to fetch student list');
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let result = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      result += decoder.decode(value, { stream: true });
+    }
+    studentList = result.split('\n').slice(1).map(row => {
+      // 使用 replace 方法去除每个元素两侧的双引号
+      return row.split(',').map(item => item.replace(/"/g, '').trim());
+    });
+    if (studentList.length > 0) {
+      studentList.pop();
+      studentList.pop();
+    }
+  } catch (error) {
+    console.error('Error fetching student list:', error);
+  }
+}
+
+  async function fetchScores() {
+    try {
+      const response = await fetch("/scores");
+      if (!response.ok) throw new Error("Failed to fetch scores");
+
+      scoresData = await response.json();
+      updateTeacherScoreTable();
+      updateTime();
+    } catch (error) {
+      console.error("Error fetching scores:", error);
+      updateTime();
+    }
+  }
+
+  function updateTeacherScoreTable() {
+    const tbody = document.getElementById("teacherScoresTable").getElementsByTagName("tbody")[0];
+    tbody.innerHTML = "";
+
+    studentList.forEach((student) => {
+      const id = student[0];
+      const score = scoresData[id] || { upload_time: '-', grade: [] };
+      const row = tbody.insertRow();
+      row.innerHTML = `
+        <td class="p-4">${id}</td>
+        <td class="p-4">${score.upload_time}</td>
+        <td class="p-4">${score.grade.length > 0 ? score.grade[0] : '-'}</td>
+        <td class="p-4">${score.grade.length > 1 ? score.grade[1] : '-'}</td>
+        <td class="p-4">${score.grade.length > 2 ? score.grade[2] : '-'}</td>
+        <td class="p-4">${score.grade.length * 10}</td>
+        <td class="p-4">${score.grade.length > 0 ? 'Submitted' : 'Not Submitted'}</td>
+      `;
+    });
+  }
+
+  function updateTime() {
+    const now = new Date();
+    document.getElementById("teacherTime").textContent = `Last updated: ${now.toLocaleTimeString()} (update every 30 secs)`;
+  }
+
+  document.getElementById("downloadCSV").addEventListener("click", function () {
+    const csvContent = convertToCSV();
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "scores.csv");
+    link.click();
+  });
+
+  function convertToCSV() {
+    const headers = ["Student ID", "Upload Time", "Phase1", "Phase2", "Phase3", "Score", "Status"];
+    let csv = headers.join(",") + "\n";
+
+    studentList.forEach((student) => {
+      const id = student[0];
+      const score = scoresData[id] || { upload_time: '-', grade: [] };
+      const row = [
+        id,
+        score.upload_time,
+        score.grade.length > 0 ? score.grade[0] : "-",
+        score.grade.length > 1 ? score.grade[1] : "-",
+        score.grade.length > 2 ? score.grade[2] : "-",
+        score.grade.length * 10,
+        score.grade.length > 0 ? 'Submitted' : 'Not Submitted'
+      ];
+      csv += row.join(",") + "\n";
+    });
+
+    return csv;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateTime();
+    fetchStudentList().then(() => {
+      fetchScores();
+      setInterval(fetchScores, UPDATE_INTERVAL);
+    });
+  });
+</script>
+  </body>
+</html>
