@@ -73,12 +73,28 @@ def upload():
 
     return render_template('upload.html')
 
-@app.route('/scores')
-def get_scores():
+
+
+
+# 修正了端点名称，使其唯一
+@app.route('/scores', endpoint='get_scores')
+def scores_endpoint():
     with open('scores.json', 'r') as f:
         scores = json.load(f)
     return jsonify(scores)
 
+# 新增了端点名称，使其唯一
+@app.route('/stulist', endpoint='get_stu_list')
+def student_list_endpoint():
+    student_ids = []
+    with open('stuList.csv', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            # 假设学生 ID 是字符串类型，确保去除前后的空格
+            student_id = row[0].strip()
+            student_ids.append(student_id)  # 添加到列表中
+    return jsonify(student_ids)  # 将列表转换为 JSON 数组
+ 
 @app.route('/scoreboard')
 def scoreboard():
     return render_template('LinklabScoreboard.html')
